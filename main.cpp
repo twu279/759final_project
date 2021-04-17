@@ -38,25 +38,25 @@ int main(int argc, char** argv){
 	out_img << type << "\n" << width << "\t" << height << "\n" << intensity << "\n";
 
 	//initial image row
-	double **image = (double**) malloc (height*sizeof(double*));
+	float **image = (float**) malloc (height*sizeof(float*));
 	//initial image column
 	for(uint i = 0; i < height; ++i){
-		image[i] = (double*) malloc (width*sizeof(double));
+		image[i] = (float*) malloc (width*sizeof(float));
 	}
 	
 	//initial output_img row
-	double **output_img = (double**) malloc (height*sizeof(double*));
+	float **output_img = (float**) malloc (height*sizeof(float*));
 	//initial outputimg column
 	for(uint i = 0; i < height; ++i){
-		output_img[i] = (double*) malloc (width*sizeof(double));
+		output_img[i] = (float*) malloc (width*sizeof(float));
 	}
 
 
 	//Read input image to image array
 	for(uint i = 0 ; i < height; ++i){
 		for(uint j = 0; j < width; ++j){
-			//read in as int but the computation will make it double 
-			//therefore using double** image
+			//read in as int but the computation will make it float 
+			//therefore using float** image
 			image[i][j] = (int)infile.get();
 		}
 	}

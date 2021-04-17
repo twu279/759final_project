@@ -3,16 +3,16 @@
 
 #define GAUSSIAN_SIZE 5 
 #define SIGMA 1
-const double pi = 3.1415926;
+const float pi = 3.1415926;
 using namespace std;
 
-void noise_reduce(double ** image, double** output_img){
+void noise_reduce(float ** image, float** output_img){
 	
 	static int center = GAUSSIAN_SIZE / 2;
 	//gaussian filter kernel 	
-	double x, y;
-	double sum = 0;
-	double gaussian_filter[GAUSSIAN_SIZE][GAUSSIAN_SIZE];
+	float x, y;
+	float sum = 0;
+	float gaussian_filter[GAUSSIAN_SIZE][GAUSSIAN_SIZE];
 	for(int i = 0; i < GAUSSIAN_SIZE; ++i){
 		x = pow(i - center, 2);
 		for (int j = 0; j < GAUSSIAN_SIZE; ++j){
@@ -36,7 +36,7 @@ void noise_reduce(double ** image, double** output_img){
 		}
 		printf("\n");
 	}
-	double sumx;
+	float sumx;
 	for (uint i = 0 ; i < height; ++i){
 		for(uint j = 0; j < width; j++){
 			sumx = 0;
@@ -54,25 +54,20 @@ void noise_reduce(double ** image, double** output_img){
 
 }
 
-void intensity_gradient(double** image){
+void intensity_gradient(float** image){
 
-	double kx[3][3] = {{-1.0, 0.0, 1.0}, {-2.0, 0.0, 2.0}, {-1.0, 0.0, 1.0}}; 
-	double ky[3][3] = {{1.0, 2.0, 1.0}, {0.0, 0.0, 0.0}, {-1.0, -2.0, -1.0}}; 
+	float kx[3][3] = {{-1.0, 0.0, 1.0}, {-2.0, 0.0, 2.0}, {-1.0, 0.0, 1.0}}; 
+	float ky[3][3] = {{1.0, 2.0, 1.0}, {0.0, 0.0, 0.0}, {-1.0, -2.0, -1.0}}; 
 
-	double partial_sumx;
-	double partial_sumy;
-	double max_val = 0; // used to normilize
-	double grad;
+	float partial_sumx;
+	float partial_sumy;
+	float max_val = 0; // used to normilize
+	float grad;
 	
-	double **tempx = (double **)malloc(height*sizeof(double*));
+	float **temp = (float **)malloc(height*sizeof(float*));
 
 	for (uint i = 0; i < height; ++i){
-		tempx[i] = (double*)malloc(width*sizeof(double));
-	}
-	double **tempy = (double **)malloc(height*sizeof(double*));
-
-	for (uint i = 0; i < height; ++i){
-		tempy[i] = (double*)malloc(width*sizeof(double));
+		temp[i] = (float*)malloc(width*sizeof(float));
 	}
 	//convolution
 	for(uint i = 0; i < height; ++i){
@@ -90,35 +85,27 @@ void intensity_gradient(double** image){
 				}
 			}
 			//write one element	
-			tempx[i][j] = partial_sumx;
-			tempy[i][j] = partial_sumy;
+			grad = sqrt(partial_sumx * partial_sumx + partial_sumy * partial_sumy);
+			
+			if(grad > max_val)
+				max_val = grad;
+			temp[i][j] = grad;
 		}	
 	}
 
 	
 	
-	for(uint i = 0; i < height; ++i){
-		for(uint j = 0; j < width; ++j){
-			grad = sqrt((tempx[i][j] * tempx[i][j] + (tempy[i][j] * tempy[i][j])));
-
-			if(grad > max_val)
-				max_val = grad;
-			image[i][j] = grad;
-		}
-	}	
 	
 	for(uint i = 0; i < height; ++i){
 		for(uint j = 0; j < width; ++j){
-			image[i][j] = image[i][j] / max_val * 255;
+			image[i][j] = temp[i][j] / max_val * 255;
 		}
 	}
 	for(uint i = 0; i < height; ++i){
-		free(tempx[i]);
-		free(tempy[i]);
+		free(temp[i]);
 	}	
 
-	free(tempx);
-	free(tempy);
+	free(temp);
 
 
 
